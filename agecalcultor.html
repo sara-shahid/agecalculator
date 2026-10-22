@@ -1,0 +1,137 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Age Calculator</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+
+    <div class="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
+
+        <h1 class="text-2xl font-bold text-center mb-6">
+            Age Calculator
+        </h1>
+
+        <form id="ageForm">
+
+            <label for="birthDate" class="block mb-2 font-medium">
+                Enter your date of birth
+            </label>
+
+            <input
+                type="date"
+                id="birthDate"
+                required
+                class="w-full border border-gray-300 p-3 rounded mb-4"
+            >
+
+            <button
+                type="submit"
+                class="w-full bg-blue-600 text-white p-3 rounded hover:bg-blue-700"
+            >
+                Calculate Age
+            </button>
+
+        </form>
+
+        <p id="message" class="text-red-600 text-sm mt-3"></p>
+
+        <div id="result" class="hidden mt-6 text-center">
+
+            <h2 class="text-xl font-semibold mb-4">Your Age</h2>
+
+            <p id="years" class="mb-2"></p>
+            <p id="months" class="mb-2"></p>
+            <p id="days"></p>
+
+        </div>
+
+    </div>
+
+    <script>
+        const ageForm = document.getElementById("ageForm");
+        const birthDateInput = document.getElementById("birthDate");
+        const result = document.getElementById("result");
+        const message = document.getElementById("message");
+
+        function getLocalDateString(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, "0");
+            const day = String(date.getDate()).padStart(2, "0");
+
+            return `${year}-${month}-${day}`;
+        }
+
+        birthDateInput.max = getLocalDateString(new Date());
+
+        ageForm.addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            message.textContent = "";
+            result.classList.add("hidden");
+
+            if (birthDateInput.value === "") {
+                message.textContent = "Please select your date of birth.";
+                return;
+            }
+
+            const [year, month, day] = birthDateInput.value
+                .split("-")
+                .map(Number);
+
+            const birthDate = new Date(year, month - 1, day);
+            const today = new Date();
+
+            today.setHours(0, 0, 0, 0);
+
+            if (
+                birthDate.getFullYear() !== year ||
+                birthDate.getMonth() !== month - 1 ||
+                birthDate.getDate() !== day ||
+                birthDate > today
+            ) {
+                message.textContent = "Please enter a valid date of birth.";
+                return;
+            }
+
+            let years = today.getFullYear() - year;
+            let months = today.getMonth() - (month - 1);
+            let days = today.getDate() - day;
+
+            if (days < 0) {
+                months--;
+
+                const previousMonthDays = new Date(
+                    today.getFullYear(),
+                    today.getMonth(),
+                    0
+                ).getDate();
+
+                days += previousMonthDays;
+            }
+
+            if (months < 0) {
+                years--;
+                months += 12;
+            }
+
+            document.getElementById("years").textContent =
+                "Years: " + years;
+
+            document.getElementById("months").textContent =
+                "Months: " + months;
+
+            document.getElementById("days").textContent =
+                "Days: " + days;
+
+            result.classList.remove("hidden");
+        });
+    </script>
+
+</body>
+</html>
